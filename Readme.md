@@ -18,12 +18,11 @@ This is a simple password generator web application that allows users to generat
 
 ## How to Use
 
-1. Open `index.html` in your web browser.
-2. Set the desired password length.
-3. Select the character types to include in the password.
-4. Click the "Generate Password" button.
-5. Copy the generated password using the "Copy" button.
-6. View recently generated passwords using the "View Passwords" button. The recently generated passwords are only viewable for your current session. Once you close your browser or close the website, they will be removed. 
+1. Set the desired password length.
+2. Select the character types to include in the password.
+3. Click the "Generate Password" button.
+4. Copy the generated password using the "Copy" button.
+5. View recently generated passwords using the "View Passwords" button. Recently generated passwords are available for viewing only during your current session. Once you close the browser or the website, they will no longer be accessible. 
 
 ## Files
 
