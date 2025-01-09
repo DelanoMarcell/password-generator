@@ -15,9 +15,9 @@ document
       return;
     }
 
-    if (length < 6 || length > 20) {
+    if (length < 6 || length > 64) {
       showAlert(
-        "Password length must be between 6 and 20 characters.",
+        "Password length must be between 6 and 64 characters.",
         "danger"
       );
       clearPassword();
@@ -65,6 +65,10 @@ const showAlert = (message, type) => {
   alertPlaceholder.innerHTML = wrapper.innerHTML;
 };
 
+const alertPlaceholderPopup = document.getElementById(
+  "liveAlertPlaceholderPopup"
+);
+
 const copyPassword = () => {
   var password = document.getElementById("generatedPassword");
   if (!password.value) return;
@@ -72,6 +76,28 @@ const copyPassword = () => {
   password.setSelectionRange(0, 99999);
   navigator.clipboard.writeText(password.value);
   showAlert("Password copied to clipboard.", "success");
+};
+
+const copyRecentPassword = (index) => {
+  var password = document.getElementById(`password-${index}`);
+
+  if (!password || !password.innerText) return;
+
+  navigator.clipboard
+    .writeText(password.innerText)
+    .then(() => {
+      document.getElementById(`btn-${index}`).innerText = "copied";
+      document.getElementById(`password-${index}`).style.color = "blue";
+
+      setTimeout(() => {
+        document.getElementById(`btn-${index}`).innerText = "copy";
+        document.getElementById(`password-${index}`).style.color = "black";
+      }, 1500);
+    })
+    .catch((err) => {
+      showAlertPopup("Failed to copy password.", "danger");
+      console.error("Error copying password: ", err);
+    });
 };
 
 const clearPassword = (removeAlert) => {
@@ -85,21 +111,43 @@ const clearPassword = (removeAlert) => {
 const modalElement = document.getElementById("viewPasswordsModal");
 const viewModal = new bootstrap.Modal(modalElement);
 
-// Show Modal
+// Show Modal with proper overflow handling
 const viewPasswords = () => {
-  //populate the modal with the recent passwords
   const passwordList = document.getElementById("passwordList");
   passwordList.innerHTML = "";
+
   recentPasswords.forEach((password, index) => {
     const listItem = document.createElement("li");
-    listItem.className = "list-group-item";
-    listItem.innerHTML = password;
+    listItem.className = `list-group-item list-${index}`;
+
+    listItem.style.display = "flex";
+    listItem.style.justifyContent = "space-between";
+    listItem.style.alignItems = "center";
+    listItem.style.gap = "1rem";
+
+    const passwordContainer = document.createElement("div");
+    passwordContainer.style.flex = "1";
+    passwordContainer.style.overflow = "hidden";
+    passwordContainer.style.textOverflow = "ellipsis";
+    passwordContainer.style.whiteSpace = "nowrap";
+
+    const passwordItem = document.createElement("p");
+    passwordItem.id = `password-${index}`;
+    passwordItem.innerText = password;
+    passwordItem.style.margin = "0";
+
+    const listCopyButton = document.createElement("button");
+    listCopyButton.className = "btn btn-outline-dark";
+    listCopyButton.id = `btn-${index}`;
+    listCopyButton.style.flexShrink = "0";
+    listCopyButton.textContent = "Copy";
+    listCopyButton.addEventListener("click", () => copyRecentPassword(index));
+
+    passwordContainer.appendChild(passwordItem);
+    listItem.appendChild(passwordContainer);
+    listItem.appendChild(listCopyButton);
     passwordList.appendChild(listItem);
   });
 
   viewModal.show();
 };
-
-//View password button functionality
-const viewButton = document.getElementById("viewButton");
-viewButton.addEventListener("click", view);
